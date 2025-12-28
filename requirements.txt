@@ -1,0 +1,28 @@
+# ----------------------------
+# Core utilities
+# ----------------------------
+pyyaml
+numpy
+tqdm
+
+# ----------------------------
+# Tokenization & LLM utilities
+# ----------------------------
+transformers
+sentencepiece
+
+# ----------------------------
+# Embeddings (RAG)
+# ----------------------------
+sentence-transformers
+
+# ----------------------------
+# Vector search
+# ----------------------------
+faiss-cpu
+
+# ----------------------------
+# Evaluation metrics
+# ----------------------------
+scikit-learn
+rouge-score
