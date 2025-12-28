@@ -1,10 +1,10 @@
+# scripts/build_index.py
+
 import json
 from pathlib import Path
 
-import faiss
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import normalize
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 
 
 def main():
@@ -19,32 +19,27 @@ def main():
     texts = [c["text"] for c in chunks]
     print(f"[INFO] Loaded {len(texts)} chunks")
 
-    # TF-IDF vectorization
-    print("[INFO] Computing TF-IDF embeddings...")
-    vectorizer = TfidfVectorizer(
-        max_features=5000,
-        ngram_range=(1, 2),
-        stop_words="english"
+    # Hugging Face embeddings (local, no API)
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    X = vectorizer.fit_transform(texts)
-    X = X.toarray().astype("float32")
-    X = normalize(X, axis=1)
+    print("[INFO] Computing embeddings and building FAISS index...")
+    vectorstore = FAISS.from_texts(
+        texts=texts,
+        embedding=embeddings,
+    )
 
-    # Build FAISS index (cosine similarity)
-    dim = X.shape[1]
-    index = faiss.IndexFlatIP(dim)
-    index.add(X)
+    # Save FAISS index in LangChain format
+    vectorstore.save_local(str(index_dir))
 
-    # Save index
-    faiss.write_index(index, str(index_dir / "faiss.index"))
-
-    # Save metadata
+    # Save metadata (chunk_id, doc_id, etc.)
     with open(index_dir / "metadata.json", "w", encoding="utf-8") as f:
         json.dump(chunks, f, indent=2)
 
-    print(f"[OK] FAISS index built with {index.ntotal} vectors")
+    print("[OK] FAISS index built with Hugging Face embeddings")
 
 
 if __name__ == "__main__":
     main()
+
