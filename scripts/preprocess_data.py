@@ -1,11 +1,7 @@
 import json
 import yaml
+import re
 from pathlib import Path
-from transformers import AutoTokenizer
-
-
-TOKENIZER_NAME = "meta-llama/Llama-2-7b-hf"  
-# replace by "mistralai/Mistral-7B-v0.1"  when using mistral
 
 
 def load_config():
@@ -13,23 +9,25 @@ def load_config():
         return yaml.safe_load(f)
 
 
-def chunk_text_with_tokenizer(text, tokenizer, chunk_size, overlap):
-    token_ids = tokenizer.encode(text, add_special_tokens=False)
+def clean_text(text: str) -> str:
+    """
+    Minimal, deterministic text cleaning suitable for TF-IDF.
+    """
+    text = text.lower()
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"[^a-z0-9.,;:!?()\-\s]", "", text)
+    return text.strip()
 
+
+def chunk_text(text: str, chunk_size: int, overlap: int):
+    words = text.split()
     chunks = []
+
     start = 0
-
-    while start < len(token_ids):
+    while start < len(words):
         end = start + chunk_size
-        chunk_token_ids = token_ids[start:end]
-
-        chunk_text = tokenizer.decode(
-            chunk_token_ids,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=True
-        )
-
-        chunks.append(chunk_text)
+        chunk_words = words[start:end]
+        chunks.append(" ".join(chunk_words))
         start = end - overlap
 
     return chunks
@@ -37,11 +35,6 @@ def chunk_text_with_tokenizer(text, tokenizer, chunk_size, overlap):
 
 def main():
     cfg = load_config()
-
-    tokenizer = AutoTokenizer.from_pretrained(
-        TOKENIZER_NAME,
-        use_fast=True
-    )
 
     raw_dir = Path(cfg["dataset"]["raw_dir"])
     processed_dir = Path(cfg["dataset"]["processed_dir"])
@@ -52,10 +45,10 @@ def main():
 
     for file in raw_dir.glob("*.txt"):
         text = file.read_text(encoding="utf-8", errors="ignore")
+        text = clean_text(text)
 
-        chunks = chunk_text_with_tokenizer(
+        chunks = chunk_text(
             text=text,
-            tokenizer=tokenizer,
             chunk_size=cfg["chunking"]["chunk_size"],
             overlap=cfg["chunking"]["chunk_overlap"],
         )
@@ -72,7 +65,7 @@ def main():
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(all_chunks, f, indent=2)
 
-    print(f"[OK] Saved {len(all_chunks)} chunks")
+    print(f"[OK] Saved {len(all_chunks)} cleaned chunks")
 
 
 if __name__ == "__main__":
