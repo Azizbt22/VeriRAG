@@ -26,3 +26,15 @@ faiss-cpu
 # ----------------------------
 scikit-learn
 rouge-score
+# Core LangChain (LCEL, runnables, prompts)
+langchain
+langchain-core
+langchain-community
+
+# Vector search & embeddings (local, no API)
+faiss-cpu
+sentence-transformers
+
+# Local LLM runtime (Ollama)
+ollama
+
