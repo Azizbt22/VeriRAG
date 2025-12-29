@@ -89,17 +89,32 @@ Refined answer:
 
 def build_agent(llm, retriever):
     """
-    Build an explicit agentic RAG pipeline.
+    Builds a simple but rigorous RAG-style agent with:
+    planning → retrieval → generation → verification → optional refinement
     """
 
     # 1️⃣ Planner
     planner = PLANNER_PROMPT | llm
 
-    # 2️⃣ Retriever
+    # 2️⃣ Retriever (stateful)
     def retrieve(inputs: Dict[str, Any]) -> Dict[str, Any]:
         docs = retriever.invoke(inputs["question"])
+
         context = "\n\n".join(d.page_content for d in docs)
-        return {**inputs, "context": context}
+
+        return {
+            "question": inputs["question"],
+            "context": context,
+            "documents": docs,
+            "retrieval_trace": [
+                {
+                    "chunk_id": d.metadata.get("chunk_id"),
+                    "doc_id": d.metadata.get("doc_id"),
+                    "preview": d.page_content[:200],
+                }
+                for d in docs
+            ],
+        }
 
     retrieve_step = RunnableLambda(retrieve)
 
@@ -121,7 +136,7 @@ def build_agent(llm, retriever):
         # Retrieve
         state = retrieve_step.invoke({"question": question})
 
-        # Generate
+        # Generate draft answer
         draft = generator.invoke(
             {
                 "question": question,
@@ -137,7 +152,7 @@ def build_agent(llm, retriever):
             }
         )
 
-        # Refine if needed
+        # Refine if verification fails
         if "FAIL" in verdict:
             final_answer = refiner.invoke(
                 {
@@ -152,6 +167,8 @@ def build_agent(llm, retriever):
             "plan": plan,
             "answer": final_answer,
             "verdict": verdict,
+            "retrieval_trace": state["retrieval_trace"],
         }
 
     return agent_run
+
