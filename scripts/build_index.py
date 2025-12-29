@@ -3,8 +3,9 @@
 import json
 from pathlib import Path
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
 
 
 def main():
@@ -12,34 +13,35 @@ def main():
     index_dir = Path("index")
     index_dir.mkdir(exist_ok=True)
 
-    # Load chunks
+    if not chunks_path.exists():
+        raise FileNotFoundError("chunks.json not found. Run preprocess_data.py first.")
+
     with open(chunks_path, "r", encoding="utf-8") as f:
         chunks = json.load(f)
 
-    texts = [c["text"] for c in chunks]
-    print(f"[INFO] Loaded {len(texts)} chunks")
+    documents = [
+        Document(
+            page_content=c["text"],
+            metadata={
+                "doc_id": c["doc_id"],
+                "chunk_id": c["chunk_id"],
+            },
+        )
+        for c in chunks
+    ]
 
-    # Hugging Face embeddings (local, no API)
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    print("[INFO] Computing embeddings and building FAISS index...")
-    vectorstore = FAISS.from_texts(
-        texts=texts,
-        embedding=embeddings,
-    )
+    vectorstore = FAISS.from_documents(documents, embeddings)
 
-    # Save FAISS index in LangChain format
-    vectorstore.save_local(str(index_dir))
+    vectorstore.save_local(index_dir)
 
-    # Save metadata (chunk_id, doc_id, etc.)
-    with open(index_dir / "metadata.json", "w", encoding="utf-8") as f:
-        json.dump(chunks, f, indent=2)
-
-    print("[OK] FAISS index built with Hugging Face embeddings")
+    print(f"[OK] Built LangChain FAISS index with {len(documents)} chunks")
 
 
 if __name__ == "__main__":
     main()
+
 

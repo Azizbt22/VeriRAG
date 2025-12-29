@@ -1,41 +1,32 @@
 # src/run.py
 
 from src.models import get_llm
-from src.rag import load_retriever
+from src.rag import get_retriever
+from src.agent import build_agent
 
 
 def main():
-    # 1. Load components
     llm = get_llm()
-    retriever = load_retriever(k=4)
+    retriever = get_retriever()
 
-    # 2. User query
-    query = "Explain what a transformer is in simple terms."
+    agent = build_agent(llm, retriever)
 
-    # 3. Retrieve documents
-    docs = retriever.invoke(query)
-    context = "\n\n".join(d.page_content for d in docs)
+    question = "Explain the transformer architecture and its key components."
 
-    # 4. Build prompt
-    prompt = f"""
-You are an expert AI assistant.
-Use the following context to answer the question.
+    result = agent(question)
 
-Context:
-{context}
-
-Question:
-{query}
-
-Answer:
-"""
-
-    # 5. Call LLM
-    response = llm.invoke(prompt)
+    print("\n=== PLAN ===\n")
+    print(result["plan"])
 
     print("\n=== ANSWER ===\n")
-    print(response)
+    print(result["answer"])
+
+    print("\n=== VERDICT ===\n")
+    print(result["verdict"])
 
 
 if __name__ == "__main__":
     main()
+
+
+
