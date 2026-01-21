@@ -1,0 +1,146 @@
+[
+  {
+    "id": "ml_easy_1",
+    "question": "What is overfitting in machine learning?",
+    "difficulty": "easy",
+    "category": "concepts"
+  },
+  {
+    "id": "ml_easy_2",
+    "question": "What is a neural network?",
+    "difficulty": "easy",
+    "category": "concepts"
+  },
+  {
+    "id": "ml_easy_3",
+    "question": "Define machine learning.",
+    "difficulty": "easy",
+    "category": "concepts"
+  },
+  {
+    "id": "ml_easy_4",
+    "question": "What is the Turing Test?",
+    "difficulty": "easy",
+    "category": "concepts"
+  },
+  {
+    "id": "ml_easy_5",
+    "question": "What are transformers in deep learning?",
+    "difficulty": "easy",
+    "category": "concepts"
+  },
+  {
+    "id": "ml_easy_6",
+    "question": "What is a large language model?",
+    "difficulty": "easy",
+    "category": "concepts"
+  },
+  {
+    "id": "ml_easy_7",
+    "question": "What is supervised learning?",
+    "difficulty": "easy",
+    "category": "methods"
+  },
+  {
+    "id": "ml_easy_8",
+    "question": "What is unsupervised learning?",
+    "difficulty": "easy",
+    "category": "methods"
+  },
+  {
+    "id": "ml_easy_9",
+    "question": "What is deep learning?",
+    "difficulty": "easy",
+    "category": "concepts"
+  },
+  {
+    "id": "ml_easy_10",
+    "question": "What is reinforcement learning?",
+    "difficulty": "easy",
+    "category": "methods"
+  },
+  {
+    "id": "ml_easy_11",
+    "question": "What is backpropagation?",
+    "difficulty": "easy",
+    "category": "methods"
+  },
+  {
+    "id": "ml_med_1",
+    "question": "Explain the transformer architecture and its key components.",
+    "difficulty": "medium",
+    "category": "architecture"
+  },
+  {
+    "id": "ml_med_2",
+    "question": "How does the attention mechanism work in transformers?",
+    "difficulty": "medium",
+    "category": "methods"
+  },
+  {
+    "id": "ml_med_3",
+    "question": "How are large language models trained?",
+    "difficulty": "medium",
+    "category": "methods"
+  },
+  {
+    "id": "ml_med_4",
+    "question": "What are the different types of neural network layers?",
+    "difficulty": "medium",
+    "category": "architecture"
+  },
+  {
+    "id": "ml_med_5",
+    "question": "How do you prevent overfitting?",
+    "difficulty": "medium",
+    "category": "methods"
+  },
+  {
+    "id": "ml_med_6",
+    "question": "What is transfer learning?",
+    "difficulty": "medium",
+    "category": "methods"
+  },
+  {
+    "id": "ml_med_7",
+    "question": "Explain gradient descent optimization.",
+    "difficulty": "medium",
+    "category": "methods"
+  },
+  {
+    "id": "ml_med_8",
+    "question": "What are activation functions and why are they important?",
+    "difficulty": "medium",
+    "category": "concepts"
+  },
+  {
+    "id": "ood_1",
+    "question": "How do I bake a chocolate cake?",
+    "difficulty": "easy",
+    "category": "out_of_domain"
+  },
+  {
+    "id": "ood_2",
+    "question": "Who won the 2022 FIFA World Cup?",
+    "difficulty": "easy",
+    "category": "out_of_domain"
+  },
+  {
+    "id": "ood_3",
+    "question": "What is the capital of Brazil?",
+    "difficulty": "easy",
+    "category": "out_of_domain"
+  },
+  {
+    "id": "ood_4",
+    "question": "How do I fix a leaking faucet?",
+    "difficulty": "easy",
+    "category": "out_of_domain"
+  },
+  {
+    "id": "ood_5",
+    "question": "What are the health benefits of green tea?",
+    "difficulty": "easy",
+    "category": "out_of_domain"
+  }
+]

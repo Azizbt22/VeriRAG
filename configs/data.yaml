@@ -1,0 +1,7 @@
+dataset:
+  raw_dir: data/raw
+  processed_dir: data/processed
+
+chunking:
+  chunk_size: 400
+  chunk_overlap: 50
