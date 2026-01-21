@@ -1,10 +1,25 @@
 # VeriRAG: Self-Verification for RAG
 
-## What is VeriRAG?
+## Overview
 
-VeriRAG is a simple approach to make RAG (Retrieval-Augmented Generation) systems more reliable. Instead of using multiple models or fine-tuning, it uses **a single carefully-designed prompt** that makes the model verify its own answers.
+**VeriRAG** is a lightweight approach to improving the *reliability* of Retrieval-Augmented Generation (RAG) systems without fine-tuning or multiple models.
 
-**Key idea:** The same model retrieves context AND verifies whether it can actually answer the question based on that context.
+Instead of introducing an external verifier, VeriRAG relies on a single instruction-tuned language model prompted to:
+1. retrieve relevant context,
+2. generate an answer,
+3. explicitly verify whether the answer is supported by the retrieved context, or abstain otherwise.
+
+
+
+---
+
+## Motivation
+
+Standard RAG systems often:
+- hallucinate when context is weak or missing,
+- answer confidently even when information is out-of-domain.
+
+VeriRAG explicitly addresses this by forcing the model to **justify its answer against retrieved evidence** and abstain when grounding is insufficient.
 
 ---
 **24 questions across 3 categories:**
@@ -32,10 +47,11 @@ faithfulness_score = (
 ```
 
 **Why multiple metrics?**
-- ROUGE catches exact/near-exact matches
-- BLEU measures precision across different n-gram sizes
-- Semantic similarity captures paraphrasing (e.g., "ML model" ≈ "machine learning system")
-- Word overlap provides fallback when embeddings unavailable
+Semantic similarity captures paraphrasing
+ROUGE / BLEU capture explicit grounding
+Word overlap provides robustness when embeddings are noisy
+
+This hybrid approach aims to avoid over-reliance on either lexical matching or embeddings alone.
 
 ## Results
 
@@ -50,9 +66,13 @@ Tested on 24 questions (ML concepts + out-of-domain) with  different models:
 
 
 **Key findings:**
--  Works best with instruction-tuned models (Llama, Qwen)
--  Perfect abstention on out-of-domain questions (100% accuracy)
--  Doesn't work with code-focused models (Phi-2)
+Key Findings
+
+✅ VeriRAG significantly improves faithfulness for instruction-tuned models (LLaMA, Qwen)
+
+✅ 100% correct abstention on out-of-domain questions
+
+⚠️ VeriRAG degrades performance for extractive / code-focused models (Phi-2)
 
 
 
@@ -98,23 +118,18 @@ print(result['answer'])
 print(result['verdict'])  # PASS, FAIL, or ABSTAIN
 ```
 
-### Run the Demo App
+### Demo Application
 
-**Basic interface:**
-```bash
-streamlit run app.py
-```
-
-**Enhanced interface with metrics:**
 ```bash
 streamlit run app_enhanced.py
 ```
 
 Features:
-- Live question answering
-- Faithfulness scoring
-- Side-by-side comparison (Vanilla vs VeriRAG)
-- Retrieval trace visualization
+
+-Live RAG vs VeriRAG comparison
+-Retrieval trace visualization
+-Faithfulness scoring
+-Explicit abstention behavior
 
 ---
 
@@ -156,7 +171,8 @@ Edit src/rag.py:
 retriever = vectorstore.as_retriever(
     search_type="similarity", 
     search_kwargs={"k": 6}  # Default: 4, try 6-8 for more context
-) ```
+)
+```
 
 
 Trade-offs:
@@ -164,10 +180,18 @@ Trade-offs:
 More chunks (k=6-8): More comprehensive context, but slower and more noise
 Fewer chunks (k=2-3): Faster, but might miss relevant info
 
+## Limitations & Future Work
 
-### Add New Models
+-Verification effectiveness is model-dependent
 
-**Edit MODEL_CONFIGS in `evaluate_final.py`:**
+-Small models may require simplified verification prompts and external lightweight verifiers
+
+**Future work** could explore:
+
+-confidence-aware scoring
+
+-adaptive verification thresholds
+
 
 
 
