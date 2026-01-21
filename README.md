@@ -151,34 +151,24 @@ python scripts/build_index.py
 ```
 Adjust Retrieval
 Edit src/rag.py:
-python# Change number of retrieved chunks
+``` python 
+# Change number of retrieved chunks
 retriever = vectorstore.as_retriever(
     search_type="similarity", 
     search_kwargs={"k": 6}  # Default: 4, try 6-8 for more context
-)
+) ```
 Trade-offs:
 
 More chunks (k=6-8): More comprehensive context, but slower and more noise
 Fewer chunks (k=2-3): Faster, but might miss relevant info
-**Modify evaluation script:**
-```python
-# In evaluate_final.py, line 14
-QUESTIONS_PATH = Path("data/eval/custom_questions.json")
-```
+
 
 ### Add New Models
 
 **Edit MODEL_CONFIGS in `evaluate_final.py`:**
 
 
-**Run:**
-```bash
-python evaluate_final.py --model your-model
-```
 
-### Adjust Verification Prompt
-
-**Edit `src/agent.py` (lines 5-17):**
 
 
 
