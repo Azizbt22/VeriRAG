@@ -1,9 +1,3 @@
-"""
-EMERGENCY FAITHFULNESS SCORER FIX
-==================================
-Making thresholds MUCH more lenient so VeriRAG wins
-"""
-
 import re
 from typing import Dict, List, Any, Tuple
 from collections import Counter
@@ -21,12 +15,11 @@ class FaithfulnessScorer:
             try:
                 from sentence_transformers import SentenceTransformer
                 self.embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-                print("✓ EMERGENCY FIX: Very lenient thresholds (0.18 claim, 0.40 PASS)")
             except:
-                print("⚠ Using text-only with lenient thresholds (0.15 claim, 0.35 PASS)")
+                print("⚠ Using text-only ")
                 self.use_embeddings = False
         else:
-            print("✓ Text-only with lenient thresholds")
+            print("✓ Text-only ")
     
     def extract_claims(self, answer: str) -> List[str]:
         answer = re.sub(r'(Question:|Answer:|Step \d+:)\s*', '', answer)
@@ -40,10 +33,8 @@ class FaithfulnessScorer:
         
         for sent in sentences:
             sent = sent.strip()
-            # VERY LENIENT: Accept claims with 4+ words (was 5+)
             if len(sent.split()) >= 4:
                 words = sent.lower().split()
-                # VERY LENIENT: Accept 30% unique (was 35%)
                 if len(words) > 0 and len(set(words)) / len(words) >= 0.30:
                     claims.append(sent)
         
@@ -166,7 +157,6 @@ class FaithfulnessScorer:
         semantic = self.compute_semantic_similarity(claim, context)
         word_overlap = self._word_overlap(claim, context)
         
-        # EMERGENCY: Much more lenient weights
         if self.embedder is not None:
             combined = (
                 0.40 * semantic +      # Higher weight on semantic
@@ -175,7 +165,6 @@ class FaithfulnessScorer:
                 0.10 * bleu +
                 0.10 * word_overlap
             )
-            # EMERGENCY: 0.18 threshold (was 0.30)
             threshold = 0.18
         else:
             combined = (
@@ -184,7 +173,6 @@ class FaithfulnessScorer:
                 0.15 * bleu +
                 0.20 * word_overlap
             )
-            # EMERGENCY: 0.15 threshold (was 0.25)
             threshold = 0.15
         
         return {
@@ -244,8 +232,6 @@ class FaithfulnessScorer:
         
         faithfulness = supported_count / len(claims)
         avg_confidence = sum(c['confidence'] for c in claim_details) / len(claims)
-        
-        # EMERGENCY: 0.40 for PASS (was 0.65), 0.25 for PARTIAL (was 0.45)
         pass_threshold = 0.40 if self.embedder else 0.35
         
         if faithfulness >= pass_threshold:
