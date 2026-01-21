@@ -121,7 +121,7 @@ print(result['verdict'])  # PASS, FAIL, or ABSTAIN
 ### Demo Application
 
 ```bash
-streamlit run app_enhanced.py
+streamlit run app.py
 ```
 
 Features:
