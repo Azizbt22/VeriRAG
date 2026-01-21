@@ -157,6 +157,8 @@ retriever = vectorstore.as_retriever(
     search_type="similarity", 
     search_kwargs={"k": 6}  # Default: 4, try 6-8 for more context
 ) ```
+
+
 Trade-offs:
 
 More chunks (k=6-8): More comprehensive context, but slower and more noise
